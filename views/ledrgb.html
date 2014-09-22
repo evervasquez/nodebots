@@ -88,15 +88,15 @@
 <script src="js/bootstrap-slider.js"></script>
 <script>
     $(function () {
-        //declaramos el socket.io
+        //declaramos e instanciamos el socket.io
         var socket = io("http://"+document.location.hostname+":3000"),notif;
 
-        //instanciamos las variables
+        //declaramos e instanciamos las variables
         var R = $("#R").slider();
         var G = $("#G").slider();
         var B = $("#B").slider();
 
-        //valores
+        //valores iniciales
         var RvalueHex = '00';
         var GvalueHex = '00';
         var BvalueHex = '00';
@@ -120,12 +120,14 @@
             socket.emit('changueColor', RvalueHex+''+GvalueHex+''+BvalueHex);
         });
 
+        //evento de retorn de datos por msg=data
         socket.on('retorno', function (msg) {
             console.log('retorno : ' + msg);
         });
 
     });
 
+    //convertir numero a hexagesimal
     function decimalToHexString(number) {
         if (number < 0) {
             number = 0xFFFFFFFF + number + 1;

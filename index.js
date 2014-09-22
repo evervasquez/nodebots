@@ -1,3 +1,4 @@
+//instancias
 var express = require('express');
 var app = express();
 var server = require('http').Server(app);
@@ -14,8 +15,10 @@ app.use(function (req, res, next) {
     }
 );
 
+//declaramos donde van a estar los static
 app.use(express.static(__dirname + '/static'));
 
+//rutas
 app.get('/', function (req, res) {
     res.sendfile('./views/index.html')
 });
@@ -24,10 +27,16 @@ app.get('/ledrgb', function (req, res) {
     res.sendfile('./views/ledrgb.html')
 });
 
+//server
 server.listen(3000, "127.0.0.1");
 
+//el johnny-five
 five.Board().on('ready', function () {
+
+    //creamos un objeto de led RGB
     var led = new five.Led.RGB({
+
+        //pines del arduino
         pins: {
             red: 3,
             green: 5,
@@ -35,23 +44,34 @@ five.Board().on('ready', function () {
         }
     })
 
+    //injectamos el led
     this.repl.inject({
         led: led
     });
 
+    //encendemos el led
     led.on();
     console.log('led on');
-    led.color("#FF0000");
-    io.on('connection', function (socket) {
 
+    //le damos color rojo
+    led.color("#FF0000");
+
+    //evento socket.io de espera
+    io.on('connection', function (socket) {
         console.log('Conectado');
 
+        //escuchamos la room changueColor y recivimos el msg
         socket.on('changueColor', function (msg) {
             console.log("#"+msg);
+
+            //le damos al led la data que recivimos
             led.color("#"+msg);
+
+            //emitimos mensaje de retorno
             io.emit('retorno', "#"+msg);
         });
 
+        //escuchamos evento de desconectar
         socket.on('disconnect', function () {
             console.log('Desconectado');
         });
