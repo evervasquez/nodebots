@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+    <title>led RGB</title>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/slider.css"/>
+    <style>
+        body {
+            width: 100%;
+        }
+
+        #RGB {
+            height: 20px;
+            background: rgb(128, 128, 128);
+        }
+
+        #RC .slider-selection {
+            background: #FF8282;
+        }
+
+        #RC .slider-handle {
+            background: red;
+        }
+
+        #GC .slider-selection {
+            background: #428041;
+        }
+
+        #GC .slider-handle {
+            background: green;
+        }
+
+        #BC .slider-selection {
+            background: #8283FF;
+        }
+
+        #BC .slider-handle {
+            border-bottom-color: blue;
+        }
+
+        #R, #G, #B {
+            width: 1000px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="space-4"></div>
+    <div class="header">
+        <ul class="nav nav-pills pull-right">
+            <li class="active"><a href="#">Página inicial</a></li>
+            <li><a href="#">Explicación</a></li>
+            <li><a href="#">Contactos</a></li>
+        </ul>
+        <h3 class="text-muted">Nodebots - Tarapoto</h3>
+        <br/>
+    </div>
+
+    <div class="jumbotron">
+        <p>
+            <b>R</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="255"
+                            data-slider-step="1" data-slider-value="100" data-slider-id="RC" id="R"
+                            data-slider-tooltip="hide" data-slider-handle="square"/>
+        </p>
+
+        <p>
+            <b>G</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="255"
+                            data-slider-step="1" data-slider-value="128" data-slider-id="GC" id="G"
+                            data-slider-tooltip="hide" data-slider-handle="round"/>
+        </p>
+
+        <p>
+            <b>B</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="255"
+                            data-slider-step="1" data-slider-value="155" data-slider-id="BC" id="B"
+                            data-slider-tooltip="hide" data-slider-handle="square"/>
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>&copy; Nodebots - Tarapoto 2014</os-p></p>
+    </div>
+
+</div>
+
+<script src="js/socket.io.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/bootstrap-slider.js"></script>
+<script>
+    $(function () {
+        //declaramos el socket.io
+        var socket = io("http://"+document.location.hostname+":3000"),notif;
+
+        //instanciamos las variables
+        var R = $("#R").slider();
+        var G = $("#G").slider();
+        var B = $("#B").slider();
+
+        //valores
+        var RvalueHex = '00';
+        var GvalueHex = '00';
+        var BvalueHex = '00';
+
+        //eventos
+        R.on('slide', function (ev) {
+            Rvalue = ev.value;
+            RvalueHex = String(decimalToHexString(Rvalue));
+            socket.emit('changueColor', RvalueHex+''+GvalueHex+''+BvalueHex);
+        });
+
+        G.on('slide', function (ev) {
+            var value = ev.value;
+            GvalueHex = String(decimalToHexString(value));
+            socket.emit('changueColor', RvalueHex+''+GvalueHex+''+BvalueHex);
+        });
+
+        B.on('slide', function (ev) {
+            var value = ev.value;
+            BvalueHex = String(decimalToHexString(value));
+            socket.emit('changueColor', RvalueHex+''+GvalueHex+''+BvalueHex);
+        });
+
+        socket.on('retorno', function (msg) {
+            console.log('retorno : ' + msg);
+        });
+
+    });
+
+    function decimalToHexString(number) {
+        if (number < 0) {
+            number = 0xFFFFFFFF + number + 1;
+        }
+        return number.toString(16).toUpperCase();
+    }
+</script>
+</body>
+</html>
