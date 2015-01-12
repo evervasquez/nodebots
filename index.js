@@ -62,11 +62,11 @@ five.Board().on('ready', function () {
     io.on('connection', function (socket) {
         console.log('Conectado');
 
-        //escuchamos la room changueColor y recivimos el msg
+        //escuchamos la room changueColor y recibimos el msg
         socket.on('changueColor', function (msg) {
             console.log("#"+msg);
 
-            //le damos al led la data que recivimos
+            //le damos al led la data que recibimos
             led.color("#"+msg);
 
             //emitimos mensaje de retorno
