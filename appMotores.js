@@ -8,7 +8,7 @@ var five = require("johnny-five");
 app.disable('x-powered-by');
 
 app.use(function (req, res, next) {
-        res.setHeader('Access-Control-Allow-Origin', "http://"+req.headers.host+':8000');
+        res.setHeader('Access-Control-Allow-Origin', "http://" + req.headers.host + ':8000');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
         res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
         next();
@@ -18,59 +18,41 @@ app.use(function (req, res, next) {
 //declaramos donde van a estar los static
 app.use(express.static(__dirname + '/static'));
 
-//rutas
-app.get('/', function (req, res) {
-    res.sendfile('./views/index.html')
-});
-
-app.get('/ledrgb', function (req, res) {
-    res.sendfile('./views/ledrgb.html')
+//ruta http://localhost:3000/motores
+app.get('/motores', function (req, res) {
+    res.sendfile('./views/motores.html')
 });
 
 //server
 server.listen(3000, "127.0.0.1");
 
 //el johnny-five
-five.Board().on('ready', function () {
+board = new five.Board();
 
-    //creamos un objeto de led RGB
-    var led = new five.Led.RGB({
+//numero de pin de arduino
+var pin1 = 9;
 
-        //pines del arduino
-        pins: {
-            red: 3,
-            green: 5,
-            blue: 6
-        }
-        ,
-        isAnode: true
-    })
+board.on('ready', function () {
 
-    //injectamos el led
-    this.repl.inject({
-        led: led
+    scalingRange = [0, 2000];
+
+    servo = new five.Servo({
+        pin: pin1,
+        range: scalingRange
     });
-
-    //encendemos el led
-    led.on();
-    console.log('led on');
-
-    //le damos color rojo
-    led.color("#0000FF");
 
     //evento socket.io de espera
     io.on('connection', function (socket) {
         console.log('Conectado');
 
         //escuchamos la room changueColor y recivimos el msg
-        socket.on('changueColor', function (msg) {
-            console.log("#"+msg);
-
-            //le damos al led la data que recivimos
-            led.color("#"+msg);
-
+        socket.on('changeVelocidadM1', function (speed) {
+            
+            servo.to(speed[1]);
+            
+            console.log("volar: "+speed[1]);
             //emitimos mensaje de retorno
-            io.emit('retorno', "#"+msg);
+            io.emit('retorno', speed);
         });
 
         //escuchamos evento de desconectar
@@ -79,4 +61,6 @@ five.Board().on('ready', function () {
         });
 
     });
+
 });
+

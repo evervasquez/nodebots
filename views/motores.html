@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+<head>
+    <title>led RGB</title>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/slider.css"/>
+    <style>
+        body {
+            width: 100%;
+        }
+
+        #RGB {
+            height: 20px;
+            background: rgb(128, 128, 128);
+        }
+
+        #RC .slider-selection {
+            background: #FF8282;
+        }
+
+        #RC .slider-handle {
+            background: red;
+        }
+
+        #GC .slider-selection {
+            background: #428041;
+        }
+
+        #GC .slider-handle {
+            background: green;
+        }
+
+        #BC .slider-selection {
+            background: #8283FF;
+        }
+
+        #BC .slider-handle {
+            border-bottom-color: blue;
+        }
+
+        #M1, #M2, #M3, #M4 {
+            width: 1000px;
+        }
+        .range{
+            background: red;
+            color:red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="space-4"></div>
+    <div class="header">
+
+        <ul class="nav nav-pills pull-right">
+            <li class="active"><a href="#">Página inicial</a></li>
+            <li><a href="#">Explicación</a></li>
+            <li><a href="#">Contactos</a></li>
+        </ul>
+        <h3 class="text-muted">Nodebots - Tarapoto</h3>
+        <br/>
+    </div>
+
+    <div class="jumbotron">
+        <p>
+            <b>Motor 1</b> <input type="text" class="span2" value="" data-slider-min="10" data-slider-max="2000"
+                            data-slider-step="1" data-slider-value="0.0" data-slider-id="RC" id="M1"
+                            data-slider-tooltip="hide" data-slider-handle="square"/>
+        </p>
+
+        <p>
+            <b>Motor 2</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="254"
+                            data-slider-step="1" data-slider-value="0" data-slider-id="GC" id="M2"
+                            data-slider-tooltip="hide" data-slider-handle="round"/>
+        </p>
+
+        <p>
+            <b>Motor 3</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="254"
+                            data-slider-step="1" data-slider-value="0" data-slider-id="BC" id="M3"
+                            data-slider-tooltip="hide" data-slider-handle="square"/>
+        </p>
+
+        <p>
+            <b>Motor 4</b> <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="254"
+                                  data-slider-step="1" data-slider-value="0" data-slider-id="BC" id="M4"
+                                  data-slider-tooltip="hide" data-slider-handle="square"/>
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>&copy; Nodebots - Tarapoto 2014</os-p></p>
+    </div>
+
+</div>
+
+<script src="js/socket.io.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/bootstrap-slider.js"></script>
+<script>
+    $(function () {
+        //declaramos e instanciamos el socket.io
+        var socket = io("http://"+document.location.hostname+":3000"),notif;
+
+        //declaramos e instanciamos las variables
+        var M1 = $("#M1").slider();
+        var M2 = $("#M2").slider();
+        var M3 = $("#M3").slider();
+        var M4 = $("#M4").slider();
+
+        //valores iniciales
+        var M1value = 0;
+        var M2value = 0;
+        var M3value = 0;
+        var M4value = 0;
+
+        //eventos
+        M1.on('slide', function (ev) {
+            M1value = ev.value;
+            socket.emit('changeVelocidadM1', M1value);
+        });
+
+        M2.on('slide', function (ev) {
+            M2value = ev.value;
+            socket.emit('changeVelocidadM2', M2value);
+        });
+
+        M3.on('slide', function (ev) {
+            M3value = ev.value;
+            socket.emit('changeVelocidadM3', M3value);
+        });
+
+        M4.on('slide', function (ev) {
+            M4value = ev.value;
+            socket.emit('changeVelocidadM4', M4value);
+        });
+
+        //evento de retorn de datos por msg=data
+        socket.on('retorno', function (msg) {
+            console.log('retorno : ' + msg);
+        });
+
+    });
+</script>
+</body>
+</html>
